@@ -1,0 +1,511 @@
+:root {
+    /* Variables centrales para mantener consistente la identidad visual. */
+    --bg-dark: #0f172a;
+    --bg-panel: #111827;
+    --text-light: #e5e7eb;
+    --accent: #38bdf8;
+    --border: rgba(255, 255, 255, 0.1);
+    --score-bg: rgba(15, 23, 42, 0.8);
+    --overlay-bg: rgba(15, 23, 42, 0.75);
+    --success: #22c55e;
+    --warning: #fbbf24;
+    --danger: #f87171;
+}
+
+* {
+    /* El modelo border-box facilita controlar el tamaño responsive. */
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at top, #1e293b, var(--bg-dark));
+    color: var(--text-light);
+    font-family: "Trebuchet MS", Verdana, sans-serif;
+    overflow-x: hidden;
+}
+
+.game-shell {
+    /* El ancho se adapta al dispositivo sin deformar el Canvas. */
+    width: min(96vw, 1100px);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.game-header {
+    text-align: center;
+    padding: 16px 0 0;
+}
+
+.game-header h1 {
+    font-size: clamp(1.8rem, 3vw, 3rem);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-shadow: 0 4px 0 rgba(2, 6, 23, 0.35);
+    animation: title-enter 600ms ease-out both;
+}
+
+.hud {
+    /* Las métricas se ordenan en una fila y saltan de línea en pantallas pequeñas. */
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.score-box {
+    min-width: 180px;
+    background: var(--score-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    animation: hud-enter 500ms ease-out both;
+}
+
+.score-box:nth-child(2) {
+    animation-delay: 80ms;
+}
+
+.score-box:nth-child(3) {
+    animation-delay: 160ms;
+}
+
+.lives-box #livesValue {
+    color: #fda4af;
+}
+
+.coins-box #coinsValue {
+    color: #facc15;
+}
+
+.label {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #cbd5e1;
+}
+
+#scoreValue,
+#highScoreValue,
+#coinsValue {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #f8fafc;
+}
+
+.shop-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: rgba(15, 23, 42, 0.72);
+    color: #cbd5e1;
+    font-size: 0.9rem;
+}
+
+.power-up-status {
+    min-height: 1.3rem;
+    color: #bae6fd;
+    font-size: 0.85rem;
+    text-align: center;
+    letter-spacing: 0.04em;
+}
+
+.objective-status {
+    min-height: 1.3rem;
+    color: #fde68a;
+    font-size: 0.85rem;
+    text-align: center;
+}
+
+.game-actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.game-actions button {
+    border: 1px solid rgba(125, 211, 252, 0.3);
+    border-radius: 8px;
+    padding: 8px 12px;
+    background: #1e293b;
+    color: #e0f2fe;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.game-actions button:hover {
+    background: #164e63;
+}
+
+#speedUpgradeButton {
+    border: 1px solid rgba(250, 204, 21, 0.45);
+    border-radius: 8px;
+    padding: 8px 12px;
+    background: #854d0e;
+    color: #fef9c3;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#speedUpgradeButton:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+}
+
+.game-panel {
+    /* Marco visual del Canvas, separado de la lógica que dibuja el juego. */
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 12px;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+    position: relative;
+    animation: panel-enter 700ms ease-out both;
+}
+
+.touch-controls {
+    display: none;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 4px 2px;
+    user-select: none;
+}
+
+.touch-direction-controls {
+    display: flex;
+    gap: 12px;
+}
+
+.touch-button {
+    width: 58px;
+    height: 50px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    background: #1e293b;
+    color: #f8fafc;
+    font-size: 1.6rem;
+    line-height: 1;
+    cursor: pointer;
+    touch-action: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 0.1s ease, background-color 0.1s ease;
+}
+
+.touch-button:active,
+.touch-button.is-pressed {
+    background: linear-gradient(180deg, #0f766e, #115e59);
+    transform: translateY(2px) scale(0.98);
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.touch-button:focus-visible {
+    outline: 3px solid #fbbf24;
+    outline-offset: 3px;
+}
+
+canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+    background: linear-gradient(to bottom, #0ea5e9 0%, #bae6fd 50%, #d9f99d 100%);
+    border-radius: 10px;
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.overlay {
+    /* Capa de estado: bloquea visualmente la partida hasta iniciar o reiniciar. */
+    position: fixed;
+    inset: 0;
+    background: var(--overlay-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.overlay.hidden {
+    display: none;
+}
+
+.menu-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(2, 6, 23, 0.78);
+}
+
+.menu-overlay.hidden {
+    display: none;
+}
+
+.menu-card {
+    width: min(92vw, 430px);
+    padding: 32px;
+    border: 1px solid rgba(125, 211, 252, 0.35);
+    border-radius: 18px;
+    background: rgba(15, 23, 42, 0.97);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+    text-align: center;
+    animation: overlay-enter 220ms ease-out both;
+}
+
+.menu-kicker {
+    margin-bottom: 8px;
+    color: #fbbf24;
+    font-size: 0.78rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.menu-card h2 {
+    margin-bottom: 12px;
+    color: #f8fafc;
+    font-size: clamp(2rem, 6vw, 3.2rem);
+}
+
+.menu-card p:not(.menu-kicker) {
+    margin-bottom: 22px;
+    color: #cbd5e1;
+}
+
+.menu-actions,
+.level-list {
+    display: grid;
+    gap: 10px;
+}
+
+.level-list.hidden {
+    display: none;
+}
+
+.menu-actions button,
+.level-button,
+#closeMapButton {
+    min-height: 44px;
+    border: 1px solid rgba(125, 211, 252, 0.35);
+    border-radius: 9px;
+    background: #164e63;
+    color: #f8fafc;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.15s ease, filter 0.15s ease, background-color 0.15s ease;
+}
+
+.menu-actions button:first-child {
+    background: linear-gradient(180deg, #7dd3fc, #38bdf8);
+    color: #0f172a;
+}
+
+.menu-actions button:hover,
+.level-button:not(:disabled):hover,
+#closeMapButton:hover {
+    filter: brightness(1.12);
+    transform: translateY(-1px);
+}
+
+.level-button.is-current {
+    border-color: #fbbf24;
+    background: #854d0e;
+}
+
+.level-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+}
+
+#closeMapButton {
+    width: 100%;
+    margin-top: 16px;
+    background: #1e293b;
+}
+
+.overlay-card {
+    background: rgba(15, 23, 42, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 18px;
+    padding: 28px 32px;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+    animation: overlay-enter 220ms ease-out both;
+}
+
+.overlay-card h2 {
+    font-size: clamp(2rem, 4vw, 3rem);
+    margin-bottom: 20px;
+    color: #f8fafc;
+}
+
+#retryButton {
+    background: linear-gradient(180deg, #7dd3fc, #38bdf8);
+    color: #0f172a;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 24px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 10px 18px rgba(56, 189, 248, 0.25);
+    transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease;
+}
+
+#retryButton:hover {
+    filter: brightness(1.08);
+    transform: translateY(-1px);
+    box-shadow: 0 12px 22px rgba(56, 189, 248, 0.35);
+}
+
+#retryButton:active {
+    transform: translateY(0);
+}
+
+#retryButton:focus-visible {
+    outline: 3px solid #fbbf24;
+    outline-offset: 3px;
+}
+
+@keyframes title-enter {
+    from {
+        opacity: 0;
+        transform: translateY(-12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 620px) {
+    .game-shell {
+        width: min(95vw, 640px);
+        gap: 12px;
+    }
+
+    .score-box {
+        min-width: 120px;
+        padding: 10px 12px;
+    }
+
+    .touch-controls {
+        display: flex;
+    }
+
+    .shop-bar {
+        align-items: stretch;
+        flex-direction: column;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+@keyframes hud-enter {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes panel-enter {
+    from {
+        opacity: 0;
+        transform: scale(0.985);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes overlay-enter {
+    from {
+        opacity: 0;
+        transform: translateY(8px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@media (max-width: 620px) {
+    /* En móviles las métricas ocupan el ancho disponible para facilitar su lectura. */
+    .game-shell {
+        width: min(94vw, 540px);
+        gap: 12px;
+    }
+
+    .game-header {
+        padding-top: 8px;
+    }
+
+    .hud {
+        gap: 8px;
+    }
+
+    .score-box {
+        min-width: 0;
+        flex: 1 1 30%;
+        padding: 10px 12px;
+    }
+
+    .label {
+        font-size: 0.72rem;
+    }
+
+    #scoreValue,
+    #highScoreValue,
+    #livesValue {
+        font-size: 1.2rem;
+    }
+
+    .game-panel {
+        padding: 7px;
+        border-radius: 12px;
+    }
+
+    .touch-controls {
+        display: flex;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    /* Reduce las animaciones decorativas para usuarios que lo soliciten. */
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+    }
+}

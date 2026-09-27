@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mi Juego 2D</title>
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+    <!-- Contenedor principal de la experiencia de juego. -->
+    <main class="game-shell">
+        <header class="game-header">
+            <h1>Mi Juego 2D</h1>
+        </header>
+
+        <!-- Datos que se actualizan desde js/game.js durante la partida. -->
+        <section class="hud" aria-label="Puntuación del juego">
+            <div class="score-box">
+                <span class="label">Puntuación</span>
+                <span id="scoreValue">0</span>
+            </div>
+
+            <div class="score-box">
+                <span class="label">Récord</span>
+                <span id="highScoreValue">0</span>
+            </div>
+
+            <div class="score-box lives-box">
+                <span class="label">Vidas</span>
+                <span id="livesValue">3</span>
+            </div>
+
+            <div class="score-box coins-box">
+                <span class="label">Monedas</span>
+                <span id="coinsValue">0</span>
+            </div>
+        </section>
+
+        <section class="shop-bar" aria-label="Tienda de mejoras">
+            <span id="shopMessage">Mejora de velocidad: nivel 0</span>
+            <button id="speedUpgradeButton" type="button">Comprar velocidad · 30</button>
+        </section>
+
+        <p id="powerUpStatus" class="power-up-status" aria-live="polite">Sin power-up activo</p>
+        <p id="objectiveStatus" class="objective-status" aria-live="polite">Objetivo: iniciar partida</p>
+        <div class="game-actions" aria-label="Controles de partida">
+            <button id="pauseButton" type="button">Pausa</button>
+            <button id="resetScoreButton" type="button">Reiniciar puntuación</button>
+            <button id="menuButton" type="button">Menú</button>
+        </div>
+
+        <!-- Superficie donde Canvas dibuja el mundo y sus entidades. -->
+        <section class="game-panel">
+            <canvas id="gameCanvas" width="960" height="540" aria-label="Canvas del juego"></canvas>
+
+            <!-- Controles táctiles opcionales; en escritorio se mantienen ocultos. -->
+            <div class="touch-controls" aria-label="Controles táctiles del juego">
+                <div class="touch-direction-controls">
+                    <button class="touch-button" type="button" data-control="left" aria-label="Mover a la izquierda">&#8592;</button>
+                    <button class="touch-button" type="button" data-control="right" aria-label="Mover a la derecha">&#8594;</button>
+                </div>
+                <button class="touch-button touch-jump-button" type="button" data-control="jump" aria-label="Saltar">&#8593;</button>
+            </div>
+        </section>
+    </main>
+
+    <div id="mainMenu" class="menu-overlay" aria-live="polite">
+        <div class="menu-card">
+            <p class="menu-kicker">Aventura 2D</p>
+            <h2>Mi Juego 2D</h2>
+            <p id="menuProgress">Nivel desbloqueado: 1</p>
+            <div class="menu-actions">
+                <button id="playButton" type="button">Jugar</button>
+                <button id="mapButton" type="button">Mapa de niveles</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="mapOverlay" class="menu-overlay hidden" aria-live="polite">
+        <div class="menu-card map-card">
+            <p class="menu-kicker">Progresión</p>
+            <h2 id="mapTitle">Elegir mapa</h2>
+            <div id="mapList" class="level-list"></div>
+            <div id="levelList" class="level-list"></div>
+            <button id="backToMapsButton" type="button" class="hidden">Ver mapas</button>
+            <button id="closeMapButton" type="button">Volver</button>
+        </div>
+    </div>
+
+    <!-- Overlay reutilizado para iniciar la partida y mostrar Game Over. -->
+    <div id="gameOverOverlay" class="overlay hidden" aria-live="polite">
+        <div class="overlay-card">
+            <h2>Game Over</h2>
+            <button id="retryButton" type="button">Reintentar</button>
+        </div>
+    </div>
+
+    <script src="js/game.js"></script>
+</body>
+</html>
