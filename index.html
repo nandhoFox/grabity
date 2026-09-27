@@ -38,13 +38,19 @@
 
         <section class="shop-bar" aria-label="Tienda de mejoras">
             <span id="shopMessage">Mejora de velocidad: nivel 0</span>
-            <button id="speedUpgradeButton" type="button">Comprar velocidad · 30</button>
+            <div class="shop-purchases">
+                <button id="speedUpgradeButton" type="button">Velocidad · 30</button>
+                <button id="buyLifeButton" type="button">+1 vida · 30</button>
+                <button id="buyShieldButton" type="button">Escudo · 20</button>
+                <button id="buyJumpButton" type="button">Salto · 20</button>
+            </div>
         </section>
 
         <p id="powerUpStatus" class="power-up-status" aria-live="polite">Sin power-up activo</p>
         <p id="objectiveStatus" class="objective-status" aria-live="polite">Objetivo: iniciar partida</p>
         <div class="game-actions" aria-label="Controles de partida">
             <button id="pauseButton" type="button">Pausa</button>
+            <button id="restartLevelButton" type="button">Reiniciar nivel</button>
             <button id="resetScoreButton" type="button">Reiniciar puntuación</button>
             <button id="menuButton" type="button">Menú</button>
         </div>
@@ -91,6 +97,8 @@
     <div id="gameOverOverlay" class="overlay hidden" aria-live="polite">
         <div class="overlay-card">
             <h2>Game Over</h2>
+            <div id="overlayStars" class="star-rating overlay-stars hidden"></div>
+            <p id="overlayMessage" class="overlay-message"></p>
             <button id="retryButton" type="button">Reintentar</button>
         </div>
     </div>
